@@ -59,6 +59,7 @@ console.log("Create needed directories");
 createDirectory(nuovo_home); // Launcher root
 createDirectory(nuovo_libraries); // Libraries
 createDirectory(nuovo_assets); // Launcher assets
+createDirectory(nuovo_assets + "/object_indexes");
 createDirectory(minecraft_obj_root); // Assets root
 createDirectory(minecraft_indexes); // Indexes
 createDirectory(minecraft_objects); // Game assets
@@ -74,6 +75,7 @@ download(version_manifest_url, version_manifest).then(() => {
 		download(x.url, json_path).then(() => {
 			let json_file = require(json_path);			
 			console.log(`Objects file ${x.url}`);
+			download(x.url, nuovo_assets + `/object_indexes/obj_${x.id}.json`);
 			let lib_info = [];			
 			for(lib of json_file.libraries) {
 				if(lib.downloads.artifact) {
