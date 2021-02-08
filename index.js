@@ -4,7 +4,6 @@ const request = require("request");
 const json = require("@javaisnotmagic/json-parser");
 const path = require("path");
 const proc = require('process');
-const { resolve } = require('path');
 
 //Constants and globals
 var nuovo_home = os.homedir() + "/.nuovo"
@@ -27,7 +26,9 @@ var resources_base = "http://resources.download.minecraft.net/";
 
 function createDirectory(directory) {
 	//Check to see if the directory exists
-	if(!fs.existsSync(directory)) {
+	if(fs.existsSync(directory)) {
+		console.log(`Directory ${directory} already exists!`);
+	} else {
 		fs.mkdirSync(directory, {recursive: true});
 	}
 }
@@ -59,7 +60,6 @@ async function download(url, path) {
 //Main
 console.log("Create needed directories");
 
-
 createDirectory(nuovo_home); // Launcher root
 createDirectory(nuovo_libraries); // Libraries
 createDirectory(nuovo_assets); // Launcher assets
@@ -82,14 +82,18 @@ console.log("Download Launcher assets...");
 			for(lib of json_file.libraries) {
 				if(lib.downloads.artifact != undefined) {
 					console.log(`Creating dcirectory ${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
-					createDirectory(`${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
+					//TODO: Figure out why the file doesn't download, and why the file is attempting to download more than onces
 					console.log(`Downloading ${lib.downloads.artifact.url} to ${nuovo_libraries}/${lib.downloads.artifact.path}`);
-					//TODO: Figure out why the file doesn't download
-					download(lib.downloads.artifact.url, `${nuovo_libraries}/${lib.downlods.artifact.path}`);
+					if(fs.existsSync(`${nuovo_libraries}/${lib.downlods.artifact.path}`)) {
+						console.log(`${nuovo_libraries}/${lib.downloads.artifact.path} already exists!`);
+					} else {
+						download(lib.downloads.artifact.url, `${nuovo_libraries}/${lib.downlods.artifact.path}`);
+					}
 				} else {
-					//do nothing
+					console.log("No artifact");
 				}
 			}
+			//TODO: Figure out why this code isnt being run
 			//Now parse the object manifest and prepare to download the objects
 			version_json = require(minecraft_indexes + `/${version}.json`).assetIndex;
 			download(version_json.url, nuovo_obj_indexes + `/${version}.json`);
