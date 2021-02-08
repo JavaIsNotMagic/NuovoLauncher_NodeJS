@@ -3,6 +3,7 @@ const os = require('os');
 const request = require("request");
 const json = require("@javaisnotmagic/json-parser");
 const path = require("path");
+const proc = require('process');
 
 //Constants and globals
 var nuovo_home = os.homedir() + "/.nuovo"
@@ -16,8 +17,6 @@ var game_root = nuovo_home + "/game";
 
 var version_manifest_url = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
 var version_manifest = os.homedir() + "/.nuovo/launcher-assets/version_manifest.json";
-
-//Helper functions
 
 //Pretty self explanitory, create directiries given a path
 //@param directory: The directory path
@@ -53,7 +52,6 @@ async function download(url, path) {
 };
 
 //Main
-
 console.log("Create needed directories");
 
 createDirectory(nuovo_home); // Launcher root
@@ -67,7 +65,11 @@ createDirectory(game_root); // Game dir, where minecraft is launched from
 
 console.log("Download Launcher assets...");
 
-download(version_manifest_url, version_manifest).then(() => {		
+ //Downloads the version manifest (A list of all minecraft versions), and parses the JSON (JavaScript Object Notation) 
+ //looking for the version id (ex. 1.7.10) as well as any libraries that this specific version needs as well as the object manifest (Minecraft's gamefiles).
+ //The object manifest will be processed in a later block
+
+ download(version_manifest_url, version_manifest).then(() => {		
 	//console.log(require(version_manifest).versions);	
 	for(x of require(version_manifest).versions) {
 		//console.log(x.url, x.id, minecraft_indexes)
@@ -75,7 +77,23 @@ download(version_manifest_url, version_manifest).then(() => {
 		download(x.url, json_path).then(() => {
 			let json_file = require(json_path);			
 			console.log(`Objects file ${x.url}`);
-			download(x.url, nuovo_assets + `/object_indexes/obj_${x.id}.json`);
+			download(x.url, nuovo_assets + `/object_indexes/obj_${x.id}.json`).then(() => {
+				//Now parse the object manifest and prepare to download the objects
+				object_json = require(nuovo_assets + `/object_indexes/obj_${x.id}.json`);
+				for(obj in object_json) {
+					console.log(obj.hash);
+				}
+			}).catch((err) => {
+				if(err.name == "Error") { //File wasn't found. Just exit peacefully.
+					console.log("Object index not found for version", x.id);
+					proc.exit(1);
+				} if(err.name == "SyntaxError") { //Unexpected end of JSON input, the json file was malformed. Just exit peacefully.
+					console.log("There was an error parsing the object file for version", x.id);
+					proc.exit(1);
+				} else {
+					console.error(err);
+				}
+			})
 			let lib_info = [];			
 			for(lib of json_file.libraries) {
 				if(lib.downloads.artifact) {
@@ -101,7 +119,7 @@ download(version_manifest_url, version_manifest).then(() => {
 			} else {
 				console.error(err);	
 			}
-		})		
+		}) 		
 	}
 }).catch((err) => {
 	console.error(err);
