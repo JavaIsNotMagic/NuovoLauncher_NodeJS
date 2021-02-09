@@ -98,8 +98,12 @@ console.log("Download Launcher assets...");
 				download(version_json.url, nuovo_obj_indexes + `/${version.id}.json`);
 			}
 			
-
-			object_json = require(nuovo_obj_indexes + `/${version.id}.json`).objects;
+			let object_json = "";
+			if(version.id.includes('rd')) {
+				console.log("Alpha versions are not currently supported");
+			} else {
+				object_json = require(nuovo_obj_indexes + `/${version.id}.json`).objects;
+			}
 			for(obj in object_json) {
 				let full_hash = object_json[obj].hash;
 				let hash_first_two = full_hash.slice(0, 2);
