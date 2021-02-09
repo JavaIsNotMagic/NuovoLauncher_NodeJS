@@ -1,7 +1,6 @@
 const fs = require('fs');
 const os = require('os');
 const request = require("request");
-const json = require("@javaisnotmagic/json-parser");
 const path = require("path");
 const proc = require('process');
 //Constants and globals
@@ -177,7 +176,6 @@ createDirectory(game_root); // Game dir, where minecraft is launched from
 
 console.log("Download Launcher assets...");
 
-let selected_version = "";
 if(selected_version == "") {
 	downlodLibsAndObjects();
 } else {
