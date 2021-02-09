@@ -154,12 +154,13 @@ async function downlodLibsAndObjects(sel_version) {
 				}
 				
 			}).catch((err) => {
-			if(err.name == "SyntaxError" || "TypeError") {
-				//do nothing
-			} else {
-				console.error(err);	
-			}
-		})}}
+				if(err.name == "SyntaxError" || "TypeError") {
+					//do nothing
+				} else {
+					console.error(err);	
+				}
+			})
+		}}
 	})
 }
 //Main
