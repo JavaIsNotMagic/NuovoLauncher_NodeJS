@@ -2,25 +2,26 @@ base = require("./src/base");
 
 //Main
 async function main() {
-
+	
 	console.log("Create needed directories");
 
-	base.createDirectory(nuovo_home); // Launcher root
-	base.createDirectory(nuovo_libraries); // Libraries
-	base.createDirectory(nuovo_assets); // Launcher assets
-	base.createDirectory(nuovo_obj_indexes); //Object indexes
-	base.createDirectory(minecraft_obj_root); // Assets root
-	base.createDirectory(minecraft_indexes); // Indexes
-	base.createDirectory(minecraft_objects); // Game assets
-	base.createDirectory(game_root); // Game dir, where minecraft is launched from
+	base.createDirectory(base.nuovo_home); // Launcher root
+	base.createDirectory(base.nuovo_libraries); // Libraries
+	base.createDirectory(base.nuovo_assets); // Launcher assets
+	base.createDirectory(base.nuovo_obj_indexes); //Object indexes
+	base.createDirectory(base.minecraft_obj_root); // Assets root
+	base.createDirectory(base.minecraft_indexes); // Indexes
+	base.createDirectory(base.minecraft_objects); // Game assets
+	base.createDirectory(base.game_root); // Game dir, where minecraft is launched from
 	
 	console.log("Download Launcher assets...");
 	
-	/*if(selected_version == "") {
-		downlodLibsAndObjects()
+	let selected_version = "";
+	if(selected_version == "") {
+		base.downlodLibsAndObjects()
 	} else {
-		downlodLibsAndObjects(selected_version);
-	}*/
+		base.downlodLibsAndObjects(selected_version);
+	}
 
 	let ver = await base.dumpVersions();
 	for(obj of ver) {

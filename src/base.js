@@ -3,22 +3,24 @@ const os = require('os');
 const request = require("request");
 const path = require("path");
 const proc = require('process');
+
 //Constants and globals
-var nuovo_home = os.homedir() + "/.nuovo"
-var nuovo_libraries = nuovo_home + "/libraries";
-var nuovo_assets = nuovo_home + "/launcher-assets";
-var nuovo_obj_indexes = nuovo_assets + "/object_indexes";
-var minecraft_obj_root = nuovo_home + "/assets";
-var minecraft_indexes = minecraft_obj_root + "/indexes";
-var minecraft_objects = minecraft_obj_root + "/objects";
-var game_root = nuovo_home + "/game";
-var version_manifest_url = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
-var version_manifest = os.homedir() + "/.nuovo/launcher-assets/version_manifest.json";
-var resources_base = "http://resources.download.minecraft.net/";
+
+nuovo_home = os.homedir() + "/.nuovo"
+nuovo_libraries = nuovo_home + "/libraries";
+nuovo_assets = nuovo_home + "/launcher-assets";
+nuovo_obj_indexes = nuovo_assets + "/object_indexes";
+minecraft_obj_root = nuovo_home + "/assets";
+minecraft_indexes = minecraft_obj_root + "/indexes";
+minecraft_objects = minecraft_obj_root + "/objects";
+game_root = nuovo_home + "/game";
+version_manifest_url = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
+version_manifest = os.homedir() + "/.nuovo/launcher-assets/version_manifest.json";
+resources_base = "http://resources.download.minecraft.net/";
 
 //Pretty self explanitory, create directiries given a path
 //@param directory: The directory path
-function createDirectory(directory) {
+createDirectory = function(directory) {
 	//Check to see if the directory exists
 	if(fs.existsSync(directory)) {
 		console.log(`Directory ${directory} already exists!`);
@@ -30,11 +32,11 @@ function createDirectory(directory) {
 //Download a file of the internet
 //@param url: Url of the file to download
 //@param dest: Destination, where to save the file
-async function download(url, path) {
+download = async function(url, path) {
 	console.log(`Downloading ${url}`);
 	await new Promise((resolve,reject) => {
-		let file = fs.createWriteStream(path)
-		let stream = request({
+		let file =fs.createWriteStream(path)
+		let stream =request({
 			url: url,
 			encoding: null
 		})
@@ -54,13 +56,13 @@ async function download(url, path) {
 //Downloads the version manifest (A list of all minecraft versions), and parses the JSON (JavaScript Object Notation) 
 //looking for the version id (ex. 1.7.10) as well as any libraries that this specific version needs as well as the object manifest (Minecraft's gamefiles).
 //@param sel_version: Selection version to launch.
-async function downlodLibsAndObjects(sel_version) {
+downlodLibsAndObjects = async function(sel_version) {
 	download(version_manifest_url, version_manifest).then(() => {		
 	for(version of require(version_manifest).versions) {
 			if(sel_version != "" && version.id.includes(sel_version)) {
-				let json_path = minecraft_indexes + "/" + sel_version + ".json";
+				let json_path =minecraft_indexes + "/" + sel_version + ".json";
 				download(version.url, json_path).then(() => {
-				let json_file = require(json_path);
+				let json_file =require(json_path);
 				for(lib of json_file.libraries) {
 					if(lib.downloads.artifact != undefined) {
 						console.log(`Creating dcirectory ${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
@@ -78,22 +80,22 @@ async function downlodLibsAndObjects(sel_version) {
 					}
 				}
 				//Now parse the object manifest and prepare to download the objects
-				version_json = require(`${minecraft_indexes}/${sel_version}.json`).assetIndex;
+				version_json =require(`${minecraft_indexes}/${sel_version}.json`).assetIndex;
 				if(sel_version.includes('rd')) {
 					console.log("Alpha versions are not currently supported");
 				} else {
 					download(version_json.url, nuovo_obj_indexes + `/${sel_version}.json`);
 				}
 		
-				let object_json = "";
+				let object_json ="";
 				if(sel_version.includes('rd')) {
 					console.log("Alpha versions are not currently supported");
 				} else {
-					object_json = require(nuovo_obj_indexes + `/${sel_version}.json`).objects;
+					object_json =require(nuovo_obj_indexes + `/${sel_version}.json`).objects;
 				}
 				for(obj in object_json) {
-					let full_hash = object_json[obj].hash;
-					let hash_first_two = full_hash.slice(0, 2);
+					let full_hash =object_json[obj].hash;
+					let hash_first_two =full_hash.slice(0, 2);
 					createDirectory(`${minecraft_objects}/${hash_first_two}/${full_hash}`);
 					//Now download the objects
 					console.log(`Downloading ${resources_base}${hash_first_two}/${full_hash} to ${minecraft_objects}/${hash_first_two}/${full_hash}/${full_hash}`);
@@ -109,10 +111,10 @@ async function downlodLibsAndObjects(sel_version) {
 			})
 			
 			} else {
-				let json_path = minecraft_indexes + "/" + version.id + ".json";
+				let json_path =minecraft_indexes + "/" + version.id + ".json";
 				console.log(json_path);
 				download(version.url, json_path).then(() => {
-				let json_file = require(json_path);
+				let json_file =require(json_path);
 				for(lib of json_file.libraries) {
 					if(lib.downloads.artifact != undefined) {
 						console.log(`Creating dcirectory ${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
@@ -130,22 +132,22 @@ async function downlodLibsAndObjects(sel_version) {
 					}
 				}
 				//Now parse the object manifest and prepare to download the objects
-				version_json = require(`${minecraft_indexes}/${version.id}.json`).assetIndex;
+				version_json =require(`${minecraft_indexes}/${version.id}.json`).assetIndex;
 				if(version.id.includes('rd')) {
 					console.log("Alpha versions are not currently supported");
 				} else {
 					download(version_json.url, nuovo_obj_indexes + `/${version.id}.json`);
 				}
 		
-				let object_json = "";
+				let object_json ="";
 				if(version.id.includes('rd')) {
 					console.log("Alpha versions are not currently supported");
 				} else {
-					object_json = require(nuovo_obj_indexes + `/${version.id}.json`).objects;
+					object_json =require(nuovo_obj_indexes + `/${version.id}.json`).objects;
 				}
 				for(obj in object_json) {
-					let full_hash = object_json[obj].hash;
-					let hash_first_two = full_hash.slice(0, 2);
+					let full_hash =object_json[obj].hash;
+					let hash_first_two =full_hash.slice(0, 2);
 					createDirectory(`${minecraft_objects}/${hash_first_two}/${full_hash}`);
 					//Now download the objects
 					console.log(`Downloading ${resources_base}${hash_first_two}/${full_hash} to ${minecraft_objects}/${hash_first_two}/${full_hash}/${full_hash}`);
@@ -162,8 +164,8 @@ async function downlodLibsAndObjects(sel_version) {
 		}}
 	})
 }
-async function dumpVersions() {
-	let	version_dict = [];
+dumpVersions = async function() {
+	let	version_dict =[];
 	await download(version_manifest_url, version_manifest).then(() => {
 		for(version of require(version_manifest).versions) {
 			version_dict.push({
@@ -176,3 +178,25 @@ async function dumpVersions() {
 	return version_dict;
 }
 
+/*------------------------------------------------------------*/
+
+//Exports
+
+exports.nuovo_home = nuovo_home;
+exports.nuovo_libraries = nuovo_libraries;
+exports.nuovo_assets = nuovo_assets;
+exports.nuovo_obj_indexes = nuovo_obj_indexes;
+exports.minecraft_obj_root = minecraft_obj_root;
+exports.minecraft_indexes = minecraft_indexes;
+exports.minecraft_objects = minecraft_objects;
+exports.game_root = game_root;
+exports.version_manifest_url = version_manifest_url;
+exports.version_manifest = version_manifest;
+exports.resources_base = resources_base;
+
+exports.createDirectory = createDirectory;
+exports.dumpVersions = dumpVersions;
+exports.downlodLibsAndObjects = downlodLibsAndObjects;
+exports.download = download;
+
+/*------------------------------------------------------------*/
