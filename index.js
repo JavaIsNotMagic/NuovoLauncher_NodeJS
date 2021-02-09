@@ -90,8 +90,6 @@ console.log("Download Launcher assets...");
 					console.log("No artifact");
 				}
 			}
-			//TODO: Figure out why this code isnt being run
-			
 			//Now parse the object manifest and prepare to download the objects
 			version_json = require(`${minecraft_indexes}/${version.id}.json`).assetIndex;
 			if(version.id.includes('rd')) {
