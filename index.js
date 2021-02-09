@@ -1,7 +1,7 @@
 const fs = require('fs');
 const os = require('os');
 const request = require("request");
-const json = require("@javaisnotmagic/json-parser");
+//const json = require("@javaisnotmagic/json-parser");
 const path = require("path");
 const proc = require('process');
 //Constants and globals

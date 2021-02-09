@@ -1,0 +1,23 @@
+{
+  "name": "nuovolauncher_nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+	"clean": "rm -r ~/.nuovo/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JavaIsNotMagic/NuovoLauncher_NodeJS.git"
+  },
+  "author": "javaisnotmagic",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JavaIsNotMagic/NuovoLauncher_NodeJS/issues"
+  },
+  "homepage": "https://github.com/JavaIsNotMagic/NuovoLauncher_NodeJS#readme",
+  "dependencies": {
+    "request": "^2.88.2"
+  }
+}
