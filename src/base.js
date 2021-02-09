@@ -3,6 +3,7 @@ const os = require('os');
 const request = require("request");
 const path = require("path");
 const proc = require('process');
+const { version } = require('punycode');
 
 //Constants and globals
 
@@ -14,6 +15,7 @@ minecraft_obj_root = nuovo_home + "/assets";
 minecraft_indexes = minecraft_obj_root + "/indexes";
 minecraft_objects = minecraft_obj_root + "/objects";
 game_root = nuovo_home + "/game";
+game_versions = game_root + "/versions";
 version_manifest_url = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
 version_manifest = os.homedir() + "/.nuovo/launcher-assets/version_manifest.json";
 resources_base = "http://resources.download.minecraft.net/";
@@ -56,103 +58,51 @@ download = async function(url, path) {
 //Downloads the version manifest (A list of all minecraft versions), and parses the JSON (JavaScript Object Notation) 
 //looking for the version id (ex. 1.7.10) as well as any libraries that this specific version needs as well as the object manifest (Minecraft's gamefiles).
 //@param sel_version: Selection version to launch.
-downlodLibsAndObjects = async function(sel_version) {
+downlodLibsAndObjects = async function() {
 	download(version_manifest_url, version_manifest).then(() => {		
-	for(version of require(version_manifest).versions) {
-			if(sel_version != "" && version.id.includes(sel_version)) {
-				let json_path =minecraft_indexes + "/" + sel_version + ".json";
-				download(version.url, json_path).then(() => {
-				let json_file =require(json_path);
-				for(lib of json_file.libraries) {
-					if(lib.downloads.artifact != undefined) {
-						console.log(`Creating dcirectory ${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
-						//TODO: Figure out why the file doesn't download, and why the file is attempting to download more than onces
-						console.log(`Downloading ${lib.downloads.artifact.url} to ${nuovo_libraries}/${lib.downloads.artifact.path}`);
-						if(fs.existsSync(`${nuovo_libraries}/${lib.downloads.artifact.path}`)) {
-							console.log(`${nuovo_libraries}/${lib.downloads.artifact.path} already exists!`);
-						} else {
-							createDirectory(`${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
-							download(lib.downloads.artifact.url, `${nuovo_libraries}/${lib.downloads.artifact.path}`);
-							console.log("Done!");
-						}
+		for(version of require(version_manifest).versions) {
+			let json_path =minecraft_indexes + "/" + version.id + ".json";
+			console.log(json_path);
+			download(version.url, json_path).then(() => {
+			let json_file =require(json_path);
+			for(lib of json_file.libraries) {
+				if(lib.downloads.artifact != undefined) {
+					console.log(`Creating dcirectory ${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
+					//TODO: Figure out why the file doesn't download, and why the file is attempting to download more than onces
+					console.log(`Downloading ${lib.downloads.artifact.url} to ${nuovo_libraries}/${lib.downloads.artifact.path}`);
+					if(fs.existsSync(`${nuovo_libraries}/${lib.downloads.artifact.path}`)) {
+						console.log(`${nuovo_libraries}/${lib.downloads.artifact.path} already exists!`);
 					} else {
-						console.log("No artifact");
+						createDirectory(`${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
+						download(lib.downloads.artifact.url, `${nuovo_libraries}/${lib.downloads.artifact.path}`);
+						console.log("Done!");
 					}
-				}
-				//Now parse the object manifest and prepare to download the objects
-				version_json =require(`${minecraft_indexes}/${sel_version}.json`).assetIndex;
-				if(sel_version.includes('rd')) {
-					console.log("Alpha versions are not currently supported");
 				} else {
-					download(version_json.url, nuovo_obj_indexes + `/${sel_version}.json`);
+					console.log("No artifact");
 				}
-		
-				let object_json ="";
-				if(sel_version.includes('rd')) {
-					console.log("Alpha versions are not currently supported");
-				} else {
-					object_json =require(nuovo_obj_indexes + `/${sel_version}.json`).objects;
-				}
-				for(obj in object_json) {
-					let full_hash =object_json[obj].hash;
-					let hash_first_two =full_hash.slice(0, 2);
-					createDirectory(`${minecraft_objects}/${hash_first_two}/${full_hash}`);
-					//Now download the objects
-					console.log(`Downloading ${resources_base}${hash_first_two}/${full_hash} to ${minecraft_objects}/${hash_first_two}/${full_hash}/${full_hash}`);
-					download(`${resources_base}${hash_first_two}/${full_hash}`, `${minecraft_objects}/${hash_first_two}/${full_hash}/${full_hash}`);
-				}
-				
-			}).catch((err) => {
-				if(err.name == "SyntaxError" || "TypeError") {
-					//do nothing
-				} else {
-					console.error(err);	
-				}
-			})
-			
+			}
+			//Now parse the object manifest and prepare to download the objects
+			version_json =require(`${minecraft_indexes}/${version.id}.json`).assetIndex;
+			if(version.id.includes('rd')) {
+				console.log("Alpha versions are not currently supported");
 			} else {
-				let json_path =minecraft_indexes + "/" + version.id + ".json";
-				console.log(json_path);
-				download(version.url, json_path).then(() => {
-				let json_file =require(json_path);
-				for(lib of json_file.libraries) {
-					if(lib.downloads.artifact != undefined) {
-						console.log(`Creating dcirectory ${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
-						//TODO: Figure out why the file doesn't download, and why the file is attempting to download more than onces
-						console.log(`Downloading ${lib.downloads.artifact.url} to ${nuovo_libraries}/${lib.downloads.artifact.path}`);
-						if(fs.existsSync(`${nuovo_libraries}/${lib.downloads.artifact.path}`)) {
-							console.log(`${nuovo_libraries}/${lib.downloads.artifact.path} already exists!`);
-						} else {
-							createDirectory(`${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
-							download(lib.downloads.artifact.url, `${nuovo_libraries}/${lib.downloads.artifact.path}`);
-							console.log("Done!");
-						}
-					} else {
-						console.log("No artifact");
-					}
-				}
-				//Now parse the object manifest and prepare to download the objects
-				version_json =require(`${minecraft_indexes}/${version.id}.json`).assetIndex;
-				if(version.id.includes('rd')) {
-					console.log("Alpha versions are not currently supported");
-				} else {
-					download(version_json.url, nuovo_obj_indexes + `/${version.id}.json`);
-				}
+				download(version_json.url, nuovo_obj_indexes + `/${version.id}.json`);
+			}
 		
-				let object_json ="";
-				if(version.id.includes('rd')) {
-					console.log("Alpha versions are not currently supported");
-				} else {
-					object_json =require(nuovo_obj_indexes + `/${version.id}.json`).objects;
-				}
-				for(obj in object_json) {
-					let full_hash =object_json[obj].hash;
-					let hash_first_two =full_hash.slice(0, 2);
-					createDirectory(`${minecraft_objects}/${hash_first_two}/${full_hash}`);
-					//Now download the objects
-					console.log(`Downloading ${resources_base}${hash_first_two}/${full_hash} to ${minecraft_objects}/${hash_first_two}/${full_hash}/${full_hash}`);
-					download(`${resources_base}${hash_first_two}/${full_hash}`, `${minecraft_objects}/${hash_first_two}/${full_hash}/${full_hash}`);
-				}
+			let object_json ="";
+			if(version.id.includes('rd')) {
+				console.log("Alpha versions are not currently supported");
+			} else {
+				object_json =require(nuovo_obj_indexes + `/${version.id}.json`).objects;
+			}
+			for(obj in object_json) {
+				let full_hash =object_json[obj].hash;
+				let hash_first_two =full_hash.slice(0, 2);
+				createDirectory(`${minecraft_objects}/${hash_first_two}/${full_hash}`);
+				//Now download the objects
+				console.log(`Downloading ${resources_base}${hash_first_two}/${full_hash} to ${minecraft_objects}/${hash_first_two}/${full_hash}/${full_hash}`);
+				download(`${resources_base}${hash_first_two}/${full_hash}`, `${minecraft_objects}/${hash_first_two}/${full_hash}/${full_hash}`);
+			}
 				
 			}).catch((err) => {
 				if(err.name == "SyntaxError" || "TypeError") {
@@ -161,21 +111,85 @@ downlodLibsAndObjects = async function(sel_version) {
 					console.error(err);	
 				}
 			})
-		}}
+		}
 	})
 }
+downloadClient = async function(sel_version) {
+	download(version_manifest_url, version_manifest).then(() => {
+		for(mcVersion of require(version_manifest).versions) {
+			if(mcVersion.url.includes(sel_version)) {
+				let json_path = minecraft_indexes + "/" + sel_version + ".json";
+				download(mcVersion.url, json_path).then(() => {
+					let json_file =require(json_path);
+					for(lib of json_file.libraries) {
+						if(lib.downloads.artifact != undefined) {
+							console.log(`Creating dcirectory ${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
+							console.log(`Downloading ${lib.downloads.artifact.url} to ${nuovo_libraries}/${lib.downloads.artifact.path}`);
+							if(fs.existsSync(`${nuovo_libraries}/${lib.downloads.artifact.path}`)) {
+								console.log(`${nuovo_libraries}/${lib.downloads.artifact.path} already exists!`);
+							} else {
+								createDirectory(`${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
+								download(lib.downloads.artifact.url, `${nuovo_libraries}/${lib.downloads.artifact.path}`);
+								console.log("Done!");
+							}
+						} else {
+							console.log("No artifact");
+						}
+					}
+					download(version_json.url, nuovo_obj_indexes + `/${sel_version}.json`).then(() => {
+						object_json =require(nuovo_obj_indexes + `/${sel_version}.json`).objects;
+						for(obj in object_json) {
+							let full_hash =object_json[obj].hash;
+							let hash_first_two =full_hash.slice(0, 2);
+							createDirectory(`${minecraft_objects}/${hash_first_two}/${full_hash}`);
+							//Now download the objects
+							console.log(`Downloading ${resources_base}${hash_first_two}/${full_hash} to ${minecraft_objects}/${hash_first_two}/${full_hash}/${full_hash}`);
+							download(`${resources_base}${hash_first_two}/${full_hash}`, `${minecraft_objects}/${hash_first_two}/${full_hash}/${full_hash}`);
+						}
+					})
+				}).catch((err) => {
+					if(err.name == "SyntaxError" || "TypeError") {
+						//do nothing
+					} else {
+						console.error(err);	
+					}
+				})
+			} else {
+				//so nothing
+			}
+		}
+	})
+}
+
 dumpVersions = async function() {
 	let	version_dict =[];
 	await download(version_manifest_url, version_manifest).then(() => {
-		for(version of require(version_manifest).versions) {
+		for(versionMC of require(version_manifest).versions) {
 			version_dict.push({
-				version: version.id,
-				url: version.url,
-				type: version.type				
+				version: versionMC.id,
+				url: versionMC.url,
+				type: versionMC.type				
 			})
 		}
 	})
 	return version_dict;
+}
+
+launchVanilla = async function(version_mc) {
+	client_url = require(`${minecraft_indexes}/${version_mc}.json`).downloads.client.url;
+	client_json = require(`${minecraft_indexes}/${version_mc}.json`);
+	download(client_url, `${game_versions}/${version_mc}.jar`).then(() => {
+		console.log("Downloaded Minecraft ", version_mc);
+		downloadClient(version_mc).then(() => {
+			for(obj in client_json) {
+				if(obj.includes("natives")) {
+					console.log(obj);
+				} else {
+					console.log("No native found.");
+				}
+			}
+		}).catch((err) => {console.error(err)})
+	}).catch((err) => {console.error(err)});
 }
 
 /*------------------------------------------------------------*/
@@ -198,5 +212,7 @@ exports.createDirectory = createDirectory;
 exports.dumpVersions = dumpVersions;
 exports.downlodLibsAndObjects = downlodLibsAndObjects;
 exports.download = download;
+exports.launchVanilla = launchVanilla;
+exports.downloadClient = downloadClient;
 
 /*------------------------------------------------------------*/

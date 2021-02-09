@@ -1,3 +1,5 @@
+const { launchVanilla } = require("./src/base");
+
 base = require("./src/base");
 
 //Main
@@ -16,14 +18,15 @@ async function main() {
 	
 	console.log("Download Launcher assets...");
 	
-	let selected_version = "";
+	let selected_version = "1.7.10";
 	if(selected_version == "") {
 		base.downlodLibsAndObjects()
 	} else {
-		base.downlodLibsAndObjects(selected_version);
+		//await base.downloadClient(selected_version);
+		base.launchVanilla(selected_version);
 	}
 
-	let ver = await base.dumpVersions();
+	/*let ver = await base.dumpVersions();
 	for(obj of ver) {
 		if(obj.type == "release") {
 			console.log(`Release: ${obj.version} Index URL ${obj.url}`);
@@ -34,7 +37,7 @@ async function main() {
 		} else {
 			console.log(`Alpha: ${obj.version} Index URL ${obj.url}`)
 		}
-	}
+	}*/
 
 }
 
