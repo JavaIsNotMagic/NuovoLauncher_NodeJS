@@ -20,7 +20,7 @@ async function main() {
 	
 	let selected_version = "1.7.10";
 	if(selected_version == "") {
-		base.downlodLibsAndObjects()
+		base.downlodLibsAndObjects();
 	} else {
 		//await base.downloadClient(selected_version);
 		base.launchVanilla(selected_version);

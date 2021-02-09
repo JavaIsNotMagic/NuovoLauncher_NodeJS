@@ -136,8 +136,8 @@ downloadClient = async function(sel_version) {
 							console.log("No artifact");
 						}
 					}
-					download(version_json.url, nuovo_obj_indexes + `/${sel_version}.json`).then(() => {
-						object_json =require(nuovo_obj_indexes + `/${sel_version}.json`).objects;
+					download(version_json.url, `${nuovo_obj_indexes}/${sel_version}.json`).then(() => {
+						object_json = require(`${nuovo_obj_indexes}/${sel_version}.json`).objects;
 						for(obj in object_json) {
 							let full_hash =object_json[obj].hash;
 							let hash_first_two =full_hash.slice(0, 2);
@@ -155,7 +155,7 @@ downloadClient = async function(sel_version) {
 					}
 				})
 			} else {
-				//so nothing
+				// do nothing
 			}
 		}
 	})
