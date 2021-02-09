@@ -4,26 +4,21 @@ const request = require("request");
 const json = require("@javaisnotmagic/json-parser");
 const path = require("path");
 const proc = require('process');
-
 //Constants and globals
 var nuovo_home = os.homedir() + "/.nuovo"
 var nuovo_libraries = nuovo_home + "/libraries";
 var nuovo_assets = nuovo_home + "/launcher-assets";
 var nuovo_obj_indexes = nuovo_assets + "/object_indexes";
-
 var minecraft_obj_root = nuovo_home + "/assets";
 var minecraft_indexes = minecraft_obj_root + "/indexes";
 var minecraft_objects = minecraft_obj_root + "/objects";
 var game_root = nuovo_home + "/game";
-
 var version_manifest_url = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
 var version_manifest = os.homedir() + "/.nuovo/launcher-assets/version_manifest.json";
-
 var resources_base = "http://resources.download.minecraft.net/";
 
 //Pretty self explanitory, create directiries given a path
 //@param directory: The directory path
-
 function createDirectory(directory) {
 	//Check to see if the directory exists
 	if(fs.existsSync(directory)) {
