@@ -118,9 +118,9 @@ downloadClient = async function(sel_version) {
 	download(version_manifest_url, version_manifest).then(() => {
 		for(mcVersion of require(version_manifest).versions) {
 			if(mcVersion.url.includes(sel_version)) {
-				let json_path = minecraft_indexes + "/" + sel_version + ".json";
+				let json_path = `${minecraft_indexes}/${version_mc}.json`;
 				download(mcVersion.url, json_path).then(() => {
-					let json_file =require(json_path);
+					let json_file = require(json_path);
 					for(lib of json_file.libraries) {
 						if(lib.downloads.artifact != undefined) {
 							console.log(`Creating dcirectory ${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
