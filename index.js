@@ -52,6 +52,9 @@ async function download(url, path) {
 	}); 
 };
 
+//Downloads the version manifest (A list of all minecraft versions), and parses the JSON (JavaScript Object Notation) 
+//looking for the version id (ex. 1.7.10) as well as any libraries that this specific version needs as well as the object manifest (Minecraft's gamefiles).
+//@param sel_version: Selection version to launch.
 async function downlodLibsAndObjects(sel_version) {
 	download(version_manifest_url, version_manifest).then(() => {		
 	for(version of require(version_manifest).versions) {
@@ -172,9 +175,6 @@ createDirectory(minecraft_objects); // Game assets
 createDirectory(game_root); // Game dir, where minecraft is launched from
 
 console.log("Download Launcher assets...");
-
-//Downloads the version manifest (A list of all minecraft versions), and parses the JSON (JavaScript Object Notation) 
-//looking for the version id (ex. 1.7.10) as well as any libraries that this specific version needs as well as the object manifest (Minecraft's gamefiles).
 
 let selected_version = "";
 if(selected_version == "") {
