@@ -84,21 +84,29 @@ console.log("Download Launcher assets...");
 					console.log(`Creating dcirectory ${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
 					//TODO: Figure out why the file doesn't download, and why the file is attempting to download more than onces
 					console.log(`Downloading ${lib.downloads.artifact.url} to ${nuovo_libraries}/${lib.downloads.artifact.path}`);
-					if(fs.existsSync(`${nuovo_libraries}/${lib.downlods.artifact.path}`)) {
+					if(fs.existsSync(`${nuovo_libraries}/${lib.downloads.artifact.path}`)) {
 						console.log(`${nuovo_libraries}/${lib.downloads.artifact.path} already exists!`);
 					} else {
-						download(lib.downloads.artifact.url, `${nuovo_libraries}/${lib.downlods.artifact.path}`);
+						createDirectory(`${nuovo_libraries}/${path.parse(lib.downloads.artifact.path).dir}`);
+						download(lib.downloads.artifact.url, `${nuovo_libraries}/${lib.downloads.artifact.path}`);
+						console.log("Done!");
 					}
 				} else {
 					console.log("No artifact");
 				}
 			}
 			//TODO: Figure out why this code isnt being run
+			
 			//Now parse the object manifest and prepare to download the objects
-			version_json = require(minecraft_indexes + `/${version}.json`).assetIndex;
-			download(version_json.url, nuovo_obj_indexes + `/${version}.json`);
+			version_json = require(`${minecraft_indexes}/${version.id}.json`).assetIndex;
+			if(version.id.includes('rd')) {
+				console.log("Alpha versions are not currently supported");
+			} else {
+				download(version_json.url, nuovo_obj_indexes + `/${version.id}.json`);
+			}
+			
 
-			object_json = require(nuovo_obj_indexes + `/${version}.json`).objects;
+			object_json = require(nuovo_obj_indexes + `/${version.id}.json`).objects;
 			for(obj in object_json) {
 				let full_hash = object_json[obj].hash;
 				let hash_first_two = full_hash.slice(0, 2);
